@@ -156,28 +156,34 @@ const getSectionPreviewItems = (section) => {
   }
 }
 
+const callButtonContent = (label, number) => `
+  <span class="call-pill__label">${label}</span>
+  <span class="call-pill__value">${number}</span>
+`
+
 const phoneButtonsMarkup = () => `
   <a
-    class="inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white shadow-sm transition hover:bg-[var(--accent-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
+    class="call-pill inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white shadow-sm transition hover:bg-[var(--accent-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
     href="tel:323-695-0290"
     data-call-button
     data-call-number="323-695-0290"
-    data-call-label="Call (English) 323-695-0290"
+    data-call-label="Call (English)"
     aria-live="polite"
   >
-    Call (English) 323-695-0290
+    ${callButtonContent('Call (English)', '323-695-0290')}
   </a>
   <a
-    class="inline-flex items-center justify-center rounded-full border border-stone-300 px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-stone-700 transition hover:border-stone-400 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
+    class="call-pill inline-flex items-center justify-center rounded-full border border-stone-300 px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-stone-700 transition hover:border-stone-400 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
     href="tel:213-280-9892"
     data-call-button
     data-call-number="213-280-9892"
-    data-call-label="Llamar (Español) 213-280-9892"
+    data-call-label="Llamar (Español)"
     aria-live="polite"
   >
-    Llamar (Espa\u00f1ol) 213-280-9892
+    ${callButtonContent('Llamar (Español)', '213-280-9892')}
   </a>
 `
+
 
 
 const projectCardMarkup = (project, index) => {
@@ -1081,16 +1087,25 @@ const copyToClipboard = async (text) => {
 const callButtonTimeouts = new WeakMap()
 
 const showCallCopied = (button) => {
-  const label = button.dataset.callLabel || button.textContent
-  button.dataset.callLabel = label
-  button.textContent = 'Copied'
+  const label = button.dataset.callLabel || ''
+  const number = button.dataset.callNumber || ''
+  if (!button.dataset.callMarkup) {
+    button.dataset.callMarkup = button.innerHTML
+  }
+  button.innerHTML = `<span class="call-pill__label">Copied</span>`
 
   if (callButtonTimeouts.has(button)) {
     clearTimeout(callButtonTimeouts.get(button))
   }
 
   const timeout = setTimeout(() => {
-    button.textContent = label
+    if (label && number) {
+      button.innerHTML = callButtonContent(label, number)
+    } else if (button.dataset.callMarkup) {
+      button.innerHTML = button.dataset.callMarkup
+    } else {
+      button.textContent = label || number
+    }
   }, 1400)
 
   callButtonTimeouts.set(button, timeout)

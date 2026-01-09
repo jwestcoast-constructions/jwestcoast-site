@@ -65,6 +65,29 @@ h3,
   box-shadow: 0 0 0 3px rgba(198, 109, 62, 0.35);
 }
 
+.call-pill {
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  flex-shrink: 1;
+  text-align: center;
+}
+
+.call-pill__label,
+.call-pill__value {
+  white-space: nowrap;
+  line-height: 1.1;
+  max-width: 100%;
+}
+
+.call-pill__label {
+  font-size: clamp(0.55rem, 2.4vw, 0.75rem);
+}
+
+.call-pill__value {
+  font-size: clamp(0.65rem, 2.8vw, 0.75rem);
+}
+
 .ba-slider {
   position: relative;
   overflow: hidden;
