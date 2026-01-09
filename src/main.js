@@ -585,9 +585,11 @@ const servicesPageMarkup = () => `
   </div>
 `
 
-const projectComparisonMarkup = (beforeSrc, afterSrc, groupId) => {
+const projectComparisonMarkup = (beforeSrc, afterSrc, groupId, title) => {
   const beforeImage = buildBackground(beforeSrc, gradientPalette[1])
   const afterImage = buildBackground(afterSrc, gradientPalette[3])
+  const beforeAlt = title ? `${title} before` : 'Before'
+  const afterAlt = title ? `${title} after` : 'After'
 
   return `
       <div
@@ -596,6 +598,8 @@ const projectComparisonMarkup = (beforeSrc, afterSrc, groupId) => {
         data-lightbox-compare
         data-lightbox-before="${beforeSrc}"
         data-lightbox-after="${afterSrc}"
+        data-lightbox-before-alt="${beforeAlt}"
+        data-lightbox-after-alt="${afterAlt}"
         ${groupId ? `data-lightbox-group="${groupId}"` : ''}
         style="--position: 50%;"
       >
@@ -637,7 +641,8 @@ const projectHeroMarkup = (project) => {
     return projectComparisonMarkup(
       project.beforeImage,
       project.afterImage,
-      `project-${project.slug}-compare`
+      `project-${project.slug}-compare`,
+      project.title
     )
   }
 
@@ -662,13 +667,16 @@ const projectGalleryMarkup = (project) => {
                 imageSrc,
                 gradientPalette[(offset + index) % gradientPalette.length]
               )
+              const altText = imageSrc
+                ? `${project.title} ${label.toLowerCase()} image ${index + 1}`
+                : ''
               const triggerAttrs = imageSrc
-                ? `data-lightbox-src="${imageSrc}" data-lightbox-group="${groupId}" data-lightbox-index="${index}" role="button" tabindex="0" aria-label="View full image"`
+                ? `data-lightbox-src="${imageSrc}" data-lightbox-alt="${altText}" data-lightbox-group="${groupId}" data-lightbox-index="${index}" aria-label="View full image"`
                 : ''
               return `
-                <article class="lightbox-trigger overflow-hidden rounded-2xl border border-stone-200/80 bg-white/80 shadow-sm" ${triggerAttrs}>
+                <button class="lightbox-trigger w-full overflow-hidden rounded-2xl border border-stone-200/80 bg-white/80 p-0 shadow-sm" type="button" ${triggerAttrs}>
                   <div class="image-tile aspect-[4/3] w-full" style="background-image: ${image};"></div>
-                </article>
+                </button>
               `
             })
             .join('')}
@@ -804,13 +812,16 @@ const collectionPageMarkup = (collection) => {
                             imageSrc,
                             gradientPalette[(collection.paletteOffset + imageIndex) % gradientPalette.length]
                           )
+                          const altText = imageSrc
+                            ? `${item.label}${item.tag ? ` ${item.tag}` : ''} image ${imageIndex + 1}`
+                            : ''
                           const triggerAttrs = imageSrc
-                            ? `data-lightbox-src="${imageSrc}" data-lightbox-group="${groupId}" data-lightbox-index="${imageIndex}" role="button" tabindex="0" aria-label="View full image"`
+                            ? `data-lightbox-src="${imageSrc}" data-lightbox-alt="${altText}" data-lightbox-group="${groupId}" data-lightbox-index="${imageIndex}" aria-label="View full image"`
                             : ''
                           return `
-                            <article class="lightbox-trigger overflow-hidden rounded-2xl border border-stone-200/80 bg-white/80 shadow-sm" ${triggerAttrs}>
+                            <button class="lightbox-trigger w-full overflow-hidden rounded-2xl border border-stone-200/80 bg-white/80 p-0 shadow-sm" type="button" ${triggerAttrs}>
                               <div class="image-tile ${imageClass} w-full" style="background-image: ${image};"></div>
-                            </article>
+                            </button>
                           `
                         })
                         .join('')}
@@ -1098,6 +1109,19 @@ const lightboxState = {
   originalLink: null
 }
 
+const getLightboxFocusable = () => {
+  if (!lightboxState.root) return []
+  const selectors = [
+    'button:not([disabled])',
+    'a[href]',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+  ]
+  return Array.from(lightboxState.root.querySelectorAll(selectors.join(',')))
+}
+
 const ensureLightbox = () => {
   if (lightboxState.root) return lightboxState
 
@@ -1115,7 +1139,7 @@ const ensureLightbox = () => {
         </div>
         <button class="lightbox__close" type="button" data-lightbox-close aria-label="Close image">Close</button>
       </div>
-      <img class="lightbox__image" alt="" />
+      <img class="lightbox__image" alt="" loading="lazy" decoding="async" width="1600" height="900" />
       <a class="lightbox__original" href="#" target="_blank" rel="noopener">Open original</a>
     </div>
   `
@@ -1150,6 +1174,7 @@ const getGroupItems = (groupId) => {
   const items = nodes
     .map((node) => ({
       src: node.getAttribute('data-lightbox-src') || '',
+      alt: node.getAttribute('data-lightbox-alt') || '',
       index: node.getAttribute('data-lightbox-index')
     }))
     .filter((item) => item.src)
@@ -1159,7 +1184,7 @@ const getGroupItems = (groupId) => {
     items.sort((a, b) => Number(a.index) - Number(b.index))
   }
 
-  return items.map((item) => item.src)
+  return items.map((item) => ({ src: item.src, alt: item.alt }))
 }
 
 const showLightboxItem = (index) => {
@@ -1170,10 +1195,12 @@ const showLightboxItem = (index) => {
   if (nextIndex < 0) nextIndex = items.length - 1
   if (nextIndex >= items.length) nextIndex = 0
 
-  const src = items[nextIndex]
+  const currentItem = items[nextIndex]
+  const src = currentItem.src || ''
+  const alt = currentItem.alt || 'Project image'
   lightboxState.index = nextIndex
   image.src = src
-  image.alt = `Image ${nextIndex + 1} of ${items.length}`
+  image.alt = alt
   originalLink.href = src
 
   const hasMultiple = items.length > 1
@@ -1217,6 +1244,8 @@ const handleLightboxClick = (event) => {
   if (compare) {
     const beforeSrc = compare.getAttribute('data-lightbox-before') || ''
     const afterSrc = compare.getAttribute('data-lightbox-after') || ''
+    const beforeAlt = compare.getAttribute('data-lightbox-before-alt') || 'Before'
+    const afterAlt = compare.getAttribute('data-lightbox-after-alt') || 'After'
     if (!beforeSrc || !afterSrc) return
 
     const rect = compare.getBoundingClientRect()
@@ -1224,7 +1253,12 @@ const handleLightboxClick = (event) => {
     const range = compare.querySelector('input[type="range"]')
     const position = range ? Number(range.value) / 100 : 0.5
     const groupId = compare.getAttribute('data-lightbox-group')
-    const items = groupId ? getGroupItems(groupId) : [beforeSrc, afterSrc]
+    const items = groupId
+      ? getGroupItems(groupId)
+      : [
+        { src: beforeSrc, alt: beforeAlt },
+        { src: afterSrc, alt: afterAlt }
+      ]
     const index = ratio <= position ? 0 : 1
 
     openLightbox({ items, index, trigger: compare })
@@ -1236,16 +1270,19 @@ const handleLightboxClick = (event) => {
   if (!trigger) return
   const src = trigger.getAttribute('data-lightbox-src')
   if (!src) return
+  const alt = trigger.getAttribute('data-lightbox-alt') || 'Project image'
 
   const groupId = trigger.getAttribute('data-lightbox-group')
-  let items = [src]
+  let items = [{ src, alt }]
   if (groupId) {
     const groupItems = getGroupItems(groupId)
-    items = groupItems.length ? groupItems : [src]
+    items = groupItems.length ? groupItems : [{ src, alt }]
   }
 
   const indexAttr = trigger.getAttribute('data-lightbox-index')
-  const index = indexAttr ? Number(indexAttr) : Math.max(0, items.indexOf(src))
+  const index = indexAttr
+    ? Number(indexAttr)
+    : Math.max(0, items.findIndex((item) => item.src === src))
 
   openLightbox({ items, index: Number.isNaN(index) ? 0 : index, trigger })
   event.preventDefault()
@@ -1256,6 +1293,20 @@ const handleLightboxKeydown = (event) => {
     if (event.key === 'Escape') {
       event.preventDefault()
       closeLightbox()
+      return
+    }
+    if (event.key === 'Tab') {
+      const focusable = getLightboxFocusable()
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
       return
     }
     if (event.key === 'ArrowLeft') {
@@ -1272,6 +1323,7 @@ const handleLightboxKeydown = (event) => {
   if (event.key !== 'Enter' && event.key !== ' ') return
   const trigger = event.target.closest('[data-lightbox-src]')
   if (!trigger) return
+  if (trigger.tagName === 'BUTTON' || trigger.tagName === 'A') return
   event.preventDefault()
   trigger.click()
 }

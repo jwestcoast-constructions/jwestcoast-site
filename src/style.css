@@ -210,6 +210,10 @@ h3,
   border-radius: 1rem;
 }
 
+.lightbox__image {
+  display: block;
+}
+
 .lightbox__controls {
   display: flex;
   align-items: center;
