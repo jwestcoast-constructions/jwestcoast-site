@@ -586,14 +586,12 @@ const servicesPageMarkup = () => `
 `
 
 const projectComparisonMarkup = (beforeSrc, afterSrc, groupId, title) => {
-  const beforeImage = buildBackground(beforeSrc, gradientPalette[1])
-  const afterImage = buildBackground(afterSrc, gradientPalette[3])
-  const beforeAlt = title ? `${title} before` : 'Before'
-  const afterAlt = title ? `${title} after` : 'After'
+  const beforeAlt = title ? `Before - ${title}` : 'Before'
+  const afterAlt = title ? `After - ${title}` : 'After'
 
   return `
       <div
-        class="comparison rounded-3xl border border-stone-200/80 bg-white/80 shadow-sm"
+        class="ba-slider aspect-[16/9] rounded-3xl border border-stone-200/80 bg-white/80 shadow-sm"
         data-comparison
         data-lightbox-compare
         data-lightbox-before="${beforeSrc}"
@@ -601,25 +599,23 @@ const projectComparisonMarkup = (beforeSrc, afterSrc, groupId, title) => {
         data-lightbox-before-alt="${beforeAlt}"
         data-lightbox-after-alt="${afterAlt}"
         ${groupId ? `data-lightbox-group="${groupId}"` : ''}
-        style="--position: 50%;"
+        style="--pos: 50%;"
       >
-        <div class="comparison__media aspect-[16/9]">
-          <div class="comparison__base image-tile" style="background-image: ${afterImage};"></div>
-          <div class="comparison__overlay image-tile" style="background-image: ${beforeImage};"></div>
+        <img class="ba-img ba-before" src="${beforeSrc}" alt="${beforeAlt}" loading="lazy" decoding="async" width="1600" height="900" />
+        <img class="ba-img ba-after" src="${afterSrc}" alt="${afterAlt}" loading="lazy" decoding="async" width="1600" height="900" />
+        <div class="ba-labels" aria-hidden="true">
+          <span class="ba-label">Before</span>
+          <span class="ba-label">After</span>
         </div>
-        <div class="comparison__labels" aria-hidden="true">
-          <span class="comparison__label">Before</span>
-          <span class="comparison__label">After</span>
-        </div>
+        <div class="ba-handle" aria-hidden="true"></div>
         <input
-          class="comparison__range"
+          class="ba-range"
           type="range"
           min="0"
           max="100"
           value="50"
-          aria-label="Before and after slider"
+          aria-label="Before/After slider"
         />
-        <div class="comparison__handle" aria-hidden="true"></div>
       </div>
     `
 }
@@ -1014,7 +1010,7 @@ const initComparisons = () => {
     if (!range) return
 
     const update = () => {
-      comparison.style.setProperty('--position', `${range.value}%`)
+      comparison.style.setProperty('--pos', `${range.value}%`)
     }
 
     update()
