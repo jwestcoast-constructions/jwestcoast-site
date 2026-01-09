@@ -589,6 +589,17 @@ const projectComparisonMarkup = (beforeSrc, afterSrc, groupId, title) => {
   const beforeAlt = title ? `Before - ${title}` : 'Before'
   const afterAlt = title ? `After - ${title}` : 'After'
 
+  if (import.meta.env?.DEV) {
+    const beforeLower = String(beforeSrc).toLowerCase()
+    const afterLower = String(afterSrc).toLowerCase()
+    if (beforeLower.includes('/after') || afterLower.includes('/before')) {
+      console.warn(
+        '[Slider] Before/after sources look reversed. Check slider asset paths.',
+        { beforeSrc, afterSrc, title }
+      )
+    }
+  }
+
   return `
       <div
         class="ba-slider aspect-[16/9] rounded-3xl border border-stone-200/80 bg-white/80 shadow-sm"
@@ -632,11 +643,17 @@ const projectCoverMarkup = (imageSrc, fallbackIndex) => {
 }
 
 const projectHeroMarkup = (project) => {
-  const hasComparison = Boolean(project.beforeImage) && Boolean(project.afterImage)
+  const beforeSrc = project.beforeImage
+    ? `/assets/projects/${project.slug}/slider/before.jpeg`
+    : ''
+  const afterSrc = project.afterImage
+    ? `/assets/projects/${project.slug}/slider/after.jpeg`
+    : ''
+  const hasComparison = Boolean(beforeSrc) && Boolean(afterSrc)
   if (hasComparison) {
     return projectComparisonMarkup(
-      project.beforeImage,
-      project.afterImage,
+      beforeSrc,
+      afterSrc,
       `project-${project.slug}-compare`,
       project.title
     )
