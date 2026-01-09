@@ -1023,8 +1023,15 @@ const initTabs = () => {
 
 const initComparisons = () => {
   const DEBUG_SLIDER = false
-  const shouldDebug =
-    DEBUG_SLIDER || window.location.hostname.includes('jwestcoast.com')
+  const params = new URLSearchParams(window.location.search)
+  const debugParam = params.get('debugSlider')
+  const debugByParam = debugParam === '1' || debugParam === 'true'
+  const host = window.location.hostname
+  const debugByHost =
+    host === 'localhost'
+    || host === '127.0.0.1'
+    || host.endsWith('jwestcoast.com')
+  const shouldDebug = DEBUG_SLIDER || debugByParam || debugByHost
   let debugAttached = false
 
   document.querySelectorAll('[data-comparison]').forEach((comparison) => {
@@ -1041,6 +1048,7 @@ const initComparisons = () => {
       const beforeImg = comparison.querySelector('img.ba-before')
       const afterImg = comparison.querySelector('img.ba-after')
       const handleEl = comparison.querySelector('.ba-handle')
+      const wrapperEl = comparison.parentElement
 
       console.log('[Slider Debug] init', {
         className: comparison.className,
@@ -1055,6 +1063,10 @@ const initComparisons = () => {
         const handleLeft = getComputedStyle(handleEl).left
         const beforeClip = getComputedStyle(beforeImg).clipPath
         const afterClip = getComputedStyle(afterImg).clipPath
+        const sliderClip = getComputedStyle(comparison).clipPath
+        const wrapperClip = wrapperEl
+          ? getComputedStyle(wrapperEl).clipPath
+          : 'none'
         const sliderW = comparison.getBoundingClientRect().width
         const beforeW = beforeImg.getBoundingClientRect().width
         const afterW = afterImg.getBoundingClientRect().width
@@ -1065,6 +1077,8 @@ const initComparisons = () => {
           handleLeft,
           beforeClip,
           afterClip,
+          sliderClip,
+          wrapperClip,
           sliderW,
           beforeW,
           afterW
