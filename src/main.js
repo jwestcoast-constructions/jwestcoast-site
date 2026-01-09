@@ -1022,18 +1022,6 @@ const initTabs = () => {
 }
 
 const initComparisons = () => {
-  const DEBUG_SLIDER = false
-  const params = new URLSearchParams(window.location.search)
-  const debugParam = params.get('debugSlider')
-  const debugByParam = debugParam === '1' || debugParam === 'true'
-  const host = window.location.hostname
-  const debugByHost =
-    host === 'localhost'
-    || host === '127.0.0.1'
-    || host.endsWith('jwestcoast.com')
-  const shouldDebug = DEBUG_SLIDER || debugByParam || debugByHost
-  let debugAttached = false
-
   document.querySelectorAll('[data-comparison]').forEach((comparison) => {
     const range = comparison.querySelector('input[type="range"]')
     if (!range) return
@@ -1042,60 +1030,8 @@ const initComparisons = () => {
       comparison.style.setProperty('--pos', `${range.value}%`)
     }
 
-    let logTelemetry = null
-    if (shouldDebug && !debugAttached) {
-      debugAttached = true
-      const beforeImg = comparison.querySelector('img.ba-before')
-      const afterImg = comparison.querySelector('img.ba-after')
-      const handleEl = comparison.querySelector('.ba-handle')
-      const wrapperEl = comparison.parentElement
-
-      console.log('[Slider Debug] init', {
-        className: comparison.className,
-        position: getComputedStyle(comparison).position,
-        beforeZ: beforeImg ? getComputedStyle(beforeImg).zIndex : 'missing',
-        afterZ: afterImg ? getComputedStyle(afterImg).zIndex : 'missing'
-      })
-
-      logTelemetry = () => {
-        if (!beforeImg || !afterImg || !handleEl) return
-        const posVar = getComputedStyle(comparison).getPropertyValue('--pos')
-        const handleLeft = getComputedStyle(handleEl).left
-        const beforeClip = getComputedStyle(beforeImg).clipPath
-        const afterClip = getComputedStyle(afterImg).clipPath
-        const sliderClip = getComputedStyle(comparison).clipPath
-        const wrapperClip = wrapperEl
-          ? getComputedStyle(wrapperEl).clipPath
-          : 'none'
-        const sliderW = comparison.getBoundingClientRect().width
-        const beforeW = beforeImg.getBoundingClientRect().width
-        const afterW = afterImg.getBoundingClientRect().width
-
-        console.log('[Slider Debug] input', {
-          rangeValue: range.value,
-          posVar,
-          handleLeft,
-          beforeClip,
-          afterClip,
-          sliderClip,
-          wrapperClip,
-          sliderW,
-          beforeW,
-          afterW
-        })
-      }
-    }
-
     update()
-    if (logTelemetry) {
-      logTelemetry()
-    }
-    range.addEventListener('input', () => {
-      update()
-      if (logTelemetry) {
-        logTelemetry()
-      }
-    })
+    range.addEventListener('input', update)
   })
 }
 

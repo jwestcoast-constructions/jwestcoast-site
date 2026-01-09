@@ -82,7 +82,7 @@ h3,
 }
 
 .ba-slider .ba-after {
-  clip-path: inset(0 0 0 calc(100% - var(--pos)));
+  clip-path: inset(0 0 0 var(--pos));
 }
 
 .ba-labels {
