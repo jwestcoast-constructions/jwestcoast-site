@@ -1022,6 +1022,11 @@ const initTabs = () => {
 }
 
 const initComparisons = () => {
+  const DEBUG_SLIDER = false
+  const shouldDebug =
+    DEBUG_SLIDER || window.location.hostname.includes('jwestcoast.com')
+  let debugAttached = false
+
   document.querySelectorAll('[data-comparison]').forEach((comparison) => {
     const range = comparison.querySelector('input[type="range"]')
     if (!range) return
@@ -1030,8 +1035,53 @@ const initComparisons = () => {
       comparison.style.setProperty('--pos', `${range.value}%`)
     }
 
+    let logTelemetry = null
+    if (shouldDebug && !debugAttached) {
+      debugAttached = true
+      const beforeImg = comparison.querySelector('img.ba-before')
+      const afterImg = comparison.querySelector('img.ba-after')
+      const handleEl = comparison.querySelector('.ba-handle')
+
+      console.log('[Slider Debug] init', {
+        className: comparison.className,
+        position: getComputedStyle(comparison).position,
+        beforeZ: beforeImg ? getComputedStyle(beforeImg).zIndex : 'missing',
+        afterZ: afterImg ? getComputedStyle(afterImg).zIndex : 'missing'
+      })
+
+      logTelemetry = () => {
+        if (!beforeImg || !afterImg || !handleEl) return
+        const posVar = getComputedStyle(comparison).getPropertyValue('--pos')
+        const handleLeft = getComputedStyle(handleEl).left
+        const beforeClip = getComputedStyle(beforeImg).clipPath
+        const afterClip = getComputedStyle(afterImg).clipPath
+        const sliderW = comparison.getBoundingClientRect().width
+        const beforeW = beforeImg.getBoundingClientRect().width
+        const afterW = afterImg.getBoundingClientRect().width
+
+        console.log('[Slider Debug] input', {
+          rangeValue: range.value,
+          posVar,
+          handleLeft,
+          beforeClip,
+          afterClip,
+          sliderW,
+          beforeW,
+          afterW
+        })
+      }
+    }
+
     update()
-    range.addEventListener('input', update)
+    if (logTelemetry) {
+      logTelemetry()
+    }
+    range.addEventListener('input', () => {
+      update()
+      if (logTelemetry) {
+        logTelemetry()
+      }
+    })
   })
 }
 
