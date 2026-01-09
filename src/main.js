@@ -745,7 +745,7 @@ const projectPageMarkup = (project) => `
         </div>
         <a
           class="inline-flex items-center justify-center rounded-full border border-stone-300 px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-stone-700 transition hover:border-stone-400 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
-          href="/#work"
+          href="/#work?tab=whole"
           data-link
         >
           Back to Work
@@ -765,7 +765,7 @@ const projectPageMarkup = (project) => `
       <section class="mt-12 flex flex-col gap-3 sm:flex-row sm:items-center">
         <a
           class="inline-flex items-center justify-center rounded-full border border-stone-300 px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-stone-700 transition hover:border-stone-400 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
-          href="/#work"
+          href="/#work?tab=whole"
           data-link
         >
           Back to Work
@@ -883,7 +883,8 @@ const renderApp = (markup, title) => {
   initComparisons()
 
   if (window.location.hash) {
-    const target = document.querySelector(window.location.hash)
+    const [targetHash] = window.location.hash.split('?')
+    const target = targetHash ? document.querySelector(targetHash) : null
     if (target) {
       requestAnimationFrame(() => {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -961,6 +962,12 @@ const initTabs = () => {
 
   const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'))
   const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'))
+  const hashQuery = window.location.hash.includes('?')
+    ? window.location.hash.split('?')[1]
+    : ''
+  const tabParam =
+    new URLSearchParams(window.location.search).get('tab')
+    || new URLSearchParams(hashQuery).get('tab')
 
   const setActiveTab = (tab, moveFocus = false) => {
     const target = tab.getAttribute('aria-controls')
@@ -1008,8 +1015,14 @@ const initTabs = () => {
     setActiveTab(tabs[nextIndex], true)
   }
 
+  const requestedTab =
+    tabParam === 'whole'
+      ? tablist.querySelector('#tab-projects')
+      : null
   const initialTab =
-    tabs.find((tab) => tab.getAttribute('aria-selected') === 'true') || tabs[0]
+    requestedTab
+    || tabs.find((tab) => tab.getAttribute('aria-selected') === 'true')
+    || tabs[0]
 
   if (initialTab) {
     setActiveTab(initialTab, false)
