@@ -233,7 +233,7 @@ const sectionMarkup = (section) => {
           aria-label="View ${section.title} gallery"
           style="background-image: ${preview.backdrop};"
         >
-          <div class="grid flex-1 grid-cols-[1.4fr_0.6fr] grid-rows-2 gap-3">
+          <div class="grid flex-1 grid-cols-[1.4fr_0.6fr] grid-rows-2 gap-3" data-work-mosaic>
             <div class="relative overflow-hidden rounded-2xl border border-stone-200/70 shadow-sm sm:row-span-2">
               <div class="image-tile h-full w-full" style="background-image: ${mainPreview.background};"></div>
               <div class="absolute inset-x-0 bottom-0 bg-white/85 px-3 py-2">
