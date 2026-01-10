@@ -547,29 +547,32 @@ const servicesPageMarkup = () => `
                   name="message"
                 ></textarea>
               </label>
-              <label class="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-                Attachment
+              <div class="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+                <span>Attachment</span>
                 <input
-                  class="rounded-xl border border-stone-200/80 bg-white px-4 py-3 text-sm text-stone-700 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
+                  class="contact-file__input"
+                  id="contact-attachments"
                   name="attachment"
                   type="file"
                   multiple
+                  data-file-input
                 />
-              </label>
+                <label
+                  class="contact-file__button rounded-xl border border-stone-200/80 bg-white px-4 py-3 text-sm text-stone-700 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
+                  for="contact-attachments"
+                >
+                  Add photos (optional)
+                </label>
+                <p class="contact-file__status text-xs text-stone-500 normal-case tracking-normal" data-file-status>
+                  No files selected
+                </p>
+              </div>
               <div class="absolute -left-[9999px] top-auto" aria-hidden="true">
                 <label>
                   Company
                   <input type="text" name="company" tabindex="-1" autocomplete="off" />
                 </label>
               </div>
-              <label class="flex items-center gap-3 text-sm text-stone-600">
-                <input
-                  class="h-4 w-4 rounded border-stone-300 text-amber-600 focus-visible:ring-amber-600"
-                  type="checkbox"
-                  name="robot"
-                />
-                I'm not a robot
-              </label>
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <button
                   class="inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white shadow-sm transition hover:bg-[var(--accent-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
@@ -887,6 +890,7 @@ const renderApp = (markup, title) => {
   initTabs()
   initGalleries()
   initComparisons()
+  initContactForm()
 
   if (window.location.hash) {
     const [targetHash] = window.location.hash.split('?')
@@ -1052,6 +1056,26 @@ const initComparisons = () => {
     update()
     range.addEventListener('input', update)
   })
+}
+
+const initContactForm = () => {
+  const form = document.querySelector('[data-contact-form]')
+  if (!form) return
+
+  const fileInput = form.querySelector('[data-file-input]')
+  const status = form.querySelector('[data-file-status]')
+  if (!fileInput || !status) return
+
+  const updateStatus = () => {
+    const count = fileInput.files ? fileInput.files.length : 0
+    status.textContent = count
+      ? `${count} file${count === 1 ? '' : 's'} selected`
+      : 'No files selected'
+  }
+
+  fileInput.addEventListener('change', updateStatus)
+  form.addEventListener('reset', () => requestAnimationFrame(updateStatus))
+  updateStatus()
 }
 
 const isTouchDevice = () =>
