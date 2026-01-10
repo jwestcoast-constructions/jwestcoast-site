@@ -60,20 +60,27 @@ export const collectionAssetsByCategory = {
       "cover": "/assets/collections/installation/door-install/01.jpeg",
       "images": [
         "/assets/collections/installation/door-install/01.jpeg",
-        "/assets/collections/installation/door-install/02.jpeg"
+        "/assets/collections/installation/door-install/02.jpeg",
+        "/assets/collections/installation/door-install/03.jpeg",
+        "/assets/collections/installation/door-install/04.jpeg"
       ]
     },
     "gate-install": {
       "cover": "/assets/collections/installation/gate-install/01.jpeg",
       "images": [
-        "/assets/collections/installation/gate-install/01.jpeg"
+        "/assets/collections/installation/gate-install/01.jpeg",
+        "/assets/collections/installation/gate-install/02.jpeg",
+        "/assets/collections/installation/gate-install/03.jpeg",
+        "/assets/collections/installation/gate-install/04.jpeg"
       ]
     },
     "window-install": {
-      "cover": "/assets/collections/installation/window-install/05.jpeg",
+      "cover": "/assets/collections/installation/window-install/01.jpeg",
       "images": [
-        "/assets/collections/installation/window-install/05.jpeg",
-        "/assets/collections/installation/window-install/06.jpeg"
+        "/assets/collections/installation/window-install/01.jpeg",
+        "/assets/collections/installation/window-install/02.jpeg",
+        "/assets/collections/installation/window-install/03.jpeg",
+        "/assets/collections/installation/window-install/04.jpeg"
       ]
     }
   },
@@ -81,33 +88,42 @@ export const collectionAssetsByCategory = {
     "exterior-paint": {
       "cover": "/assets/collections/painting/exterior-paint/01.jpeg",
       "images": [
-        "/assets/collections/painting/exterior-paint/01.jpeg"
+        "/assets/collections/painting/exterior-paint/01.jpeg",
+        "/assets/collections/painting/exterior-paint/02.jpeg",
+        "/assets/collections/painting/exterior-paint/03.jpeg"
       ]
     },
     "interior-paint": {
       "cover": "/assets/collections/painting/interior-paint/01.jpeg",
       "images": [
-        "/assets/collections/painting/interior-paint/01.jpeg"
+        "/assets/collections/painting/interior-paint/01.jpeg",
+        "/assets/collections/painting/interior-paint/02.jpeg",
+        "/assets/collections/painting/interior-paint/03.jpeg",
+        "/assets/collections/painting/interior-paint/04.jpeg"
       ]
     },
     "trim-paint": {
       "cover": "/assets/collections/painting/trim-paint/01.jpeg",
       "images": [
-        "/assets/collections/painting/trim-paint/01.jpeg"
+        "/assets/collections/painting/trim-paint/01.jpeg",
+        "/assets/collections/painting/trim-paint/02.jpeg",
+        "/assets/collections/painting/trim-paint/03.jpeg",
+        "/assets/collections/painting/trim-paint/04.jpeg"
       ]
     }
   },
   "roofing": {
     "patch": {
-      "cover": "/assets/collections/roofing/patch/02.jpeg",
+      "cover": "/assets/collections/roofing/patch/01.jpeg",
       "images": [
-        "/assets/collections/roofing/patch/02.jpeg"
+        "/assets/collections/roofing/patch/01.jpeg"
       ]
     },
     "re-roof": {
       "cover": "/assets/collections/roofing/re-roof/01.jpeg",
       "images": [
-        "/assets/collections/roofing/re-roof/01.jpeg"
+        "/assets/collections/roofing/re-roof/01.jpeg",
+        "/assets/collections/roofing/re-roof/02.jpeg"
       ]
     },
     "tile-reset": {
