@@ -1189,9 +1189,15 @@ const handleContactFormSubmit = async (event) => {
       form.reset()
       return
     }
+    if (error && result && result.error) {
+      error.textContent = result.error
+    }
   } catch {}
 
   if (error) {
+    if (!error.textContent) {
+      error.textContent = 'Error sending - please call.'
+    }
     error.hidden = false
   }
 }
