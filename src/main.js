@@ -569,8 +569,8 @@ const servicesPageMarkup = () => `
               </div>
               <div class="absolute -left-[9999px] top-auto" aria-hidden="true">
                 <label>
-                  Company
-                  <input type="text" name="company" tabindex="-1" autocomplete="off" />
+                  Website
+                  <input type="text" name="website" tabindex="-1" autocomplete="off" />
                 </label>
               </div>
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -581,7 +581,10 @@ const servicesPageMarkup = () => `
                   Submit
                 </button>
                 <p class="text-sm text-emerald-700" data-form-success hidden>
-                  Message prepared - we'll follow up shortly.
+                  Sent - we'll get back to you.
+                </p>
+                <p class="text-sm text-rose-600" data-form-error hidden>
+                  Error sending - please call.
                 </p>
               </div>
             </form>
@@ -1149,16 +1152,48 @@ const handleCallButtonClick = async (event) => {
   }
 }
 
-const handleContactFormSubmit = (event) => {
+const handleContactFormSubmit = async (event) => {
   const form = event.target.closest('[data-contact-form]')
   if (!form) return
 
   event.preventDefault()
   const success = form.querySelector('[data-form-success]')
-  if (success) {
-    success.hidden = false
+  const error = form.querySelector('[data-form-error]')
+  if (success) success.hidden = true
+  if (error) error.hidden = true
+
+  const formData = new FormData(form)
+  const payload = {
+    name: (formData.get('name') || '').toString().trim(),
+    phone: (formData.get('phone') || '').toString().trim(),
+    email: (formData.get('email') || '').toString().trim(),
+    service: (formData.get('service') || '').toString().trim(),
+    message: (formData.get('message') || '').toString().trim(),
+    website: (formData.get('website') || '').toString().trim()
   }
-  form.reset()
+
+  try {
+    const response = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+
+    let result = null
+    try {
+      result = await response.json()
+    } catch {}
+
+    if (response.ok && result && result.ok) {
+      if (success) success.hidden = false
+      form.reset()
+      return
+    }
+  } catch {}
+
+  if (error) {
+    error.hidden = false
+  }
 }
 
 const lightboxState = {
