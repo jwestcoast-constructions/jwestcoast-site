@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 Resend_Email_Key.txt
 .dev.vars
+.wrangler/
