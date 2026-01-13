@@ -552,7 +552,7 @@ const servicesPageMarkup = () => `
                 <input
                   class="contact-file__input"
                   id="contact-attachments"
-                  name="attachment"
+                  name="photos"
                   type="file"
                   multiple
                   data-file-input
@@ -1162,21 +1162,14 @@ const handleContactFormSubmit = async (event) => {
   if (success) success.hidden = true
   if (error) error.hidden = true
 
-  const formData = new FormData(form)
-  const payload = {
-    name: (formData.get('name') || '').toString().trim(),
-    phone: (formData.get('phone') || '').toString().trim(),
-    email: (formData.get('email') || '').toString().trim(),
-    service: (formData.get('service') || '').toString().trim(),
-    message: (formData.get('message') || '').toString().trim(),
-    website: (formData.get('website') || '').toString().trim()
-  }
-
   try {
+    const formData = new FormData(form)
+    if (!formData.has('website')) {
+      formData.append('website', '')
+    }
     const response = await fetch('/api/contact', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: formData
     })
 
     let result = null
