@@ -28,10 +28,21 @@ const signToken = async (secret, payload) => {
 
 export const onRequest = async ({ params, request, env }) => {
   try {
-    const key = typeof params.path === 'string' ? params.path : ''
+    const rawPath = params?.path
+    let key = Array.isArray(rawPath)
+      ? rawPath.join('/')
+      : typeof rawPath === 'string'
+        ? rawPath
+        : ''
+    if (key.startsWith('/')) {
+      key = key.slice(1)
+    }
     if (!key) {
       return jsonResponse({ ok: false, error: 'Not found' }, 404)
     }
+
+    console.log('[uploads] raw params.path:', rawPath)
+    console.log('[uploads] computed key:', key)
 
     const url = new URL(request.url)
     const expParam = url.searchParams.get('exp')
@@ -62,6 +73,7 @@ export const onRequest = async ({ params, request, env }) => {
     }
 
     const obj = await env.UPLOADS.get(key)
+    console.log('[uploads] exists:', Boolean(obj))
     if (!obj) {
       return jsonResponse({ ok: false, error: 'Not found' }, 404)
     }
